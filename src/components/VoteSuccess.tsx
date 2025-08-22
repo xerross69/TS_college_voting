@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,6 +6,38 @@ import { CheckCircle, Trophy, Users, Clock } from 'lucide-react';
 
 const VoteSuccess = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Disable right click
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    // Disable back navigation
+    history.pushState(null, "", location.href);
+    const handlePopState = () => history.go(1);
+    window.addEventListener("popstate", handlePopState);
+
+    // Disable certain keys
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.keyCode === 123 || // F12
+        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+        (e.ctrlKey && e.keyCode === 82) || // Ctrl+R
+        (e.ctrlKey && e.keyCode === 85) // Ctrl+U
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup on unmount
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("popstate", handlePopState);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
